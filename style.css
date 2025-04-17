@@ -1,0 +1,101 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+  background-image: url("486374407_1834987017278719_4853302109216346905_n.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#infoBox {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  color: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  max-width: 80%;
+  margin: 20px auto;
+  font-weight: 500;
+  font-size: 1.3rem;
+  line-height: 1.8;
+  text-shadow: 1px 1px 3px black;
+}
+
+.btn-reset {
+  display: none;
+  margin-top: 10px;
+  background-color: #444;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-reset:hover {
+  background-color: #222;
+}
+
+.svg-map {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+/* Responsive SVG */
+.svg-map svg {
+  width: 100%;
+  height: auto;
+}
+
+.info-box {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 8px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.btn-reset {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+
+text.hover {
+  font-size: 12px;
+  pointer-events: auto;
+}
+
+/* Menší zařízení */
+@media (max-width: 768px) {
+  #infoBox {
+    font-size: 1.1rem;
+    padding: 16px;
+    margin-bottom: 0;
+  }
+
+  text.hover {
+    font-size: 10px;
+  }
+
+  .svg-map svg {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100%;
+  }
+
+  html, body {
+    height: auto;
+    min-height: 100vh;
+  }
+}
