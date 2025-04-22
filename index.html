@@ -19,8 +19,7 @@
         <section id="content">
             <div class="content-wrap bg-topmap04 nopadding">
                 <div class="container clearfix center">
-                    <div class="svg-map mapa-cesko"
-                        title="Záchrana potkanů odevšad">
+                    <div class="svg-map mapa-cesko" title="Záchrana potkanů odevšad">
                         <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"
                             preserveAspectRatio="xMinYMin meet" version="1" x="0" y="0" viewBox="0 0 1116.25 689.86"
                             enable-background="new 0 0 1116.247 689.856" xml:space="preserve" id="svg2">
@@ -221,31 +220,32 @@
         document.addEventListener("DOMContentLoaded", function () {
             const infoBox = document.getElementById("infoBox");
             const resetBtn = document.getElementById("resetBtn");
-    
+
             const kraje = document.querySelectorAll(".hover");
-    
+
             kraje.forEach(kraj => {
                 kraj.style.cursor = "pointer";
                 kraj.onclick = function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-    
+
                     const id = this.getAttribute("note");
-    
+
                     const data = {
                         "plzensky-kraj": `
                             <h2>Pomocníci v Plzeňském kraji</h2>
                             <ul>
-                                <li><strong>Vojta</strong></li>
-                                <li><strong>Zuzka</strong></li>
+                                <li><strong>Vojtěch Amon</strong></li>
+                                <li><strong>Zuzana Zelinková</strong></li>
                                 <li><strong>Kany Kanystr</strong></li>
+                                <li><strong>Veru Škorňáková</strong></li>
                             </ul>
                         `,
                         "jihocesky-kraj": `
                             <h2>Pomocníci v Jihočeském kraji</h2>
                             <ul>
-                                <li><strong>Vojta</strong></li>
-                                <li><strong>Zuzka</strong></li>
+                                <li><strong>Vojtěch Amon</strong></li>
+                                <li><strong>Zuzana Zelinková</strong></li>
                             </ul>
                         `,
                         "hlavni-mesto-praha": `
@@ -254,7 +254,10 @@
                                 <li><strong>Debora</strong></li>
                                 <li><strong>MJ Croft</strong></li>
                                 <li><strong>Samantha Patrná</strong></li>
-                                <li><strong>Jura a Kolkovic Myšáci</strong></li>
+                                <li><strong>Jura Kotek</strong></li>
+                                <li><strong>Kolkovic Myšáci</strong></li>
+                                <li><strong>Marcela Šarmanová</strong></li>
+                                <li><strong>Helena Jarošová</strong></li>
                             </ul>
                         `,
                         "kraj-vysocina": `
@@ -277,6 +280,8 @@
                                 <li><strong>Milan Miňo Bača</strong></li>
                                 <li><strong>Adam Harangozó</strong></li>
                                 <li><strong>Helena Jarošová</strong></li>
+                                <li><strong>Esmisoi Vieš</strong></li>
+                                <li><strong>Martina Novotná</strong></li>
                             </ul>
                         `,
                         "zlinsky-kraj": `
@@ -301,7 +306,13 @@
                         "stredocesky-kraj": `
                             <h2>Pomocníci ve Středočeském kraji</h2>
                             <ul>
-                                <li><strong>Jura a Kolkovic Myšáci</strong></li>
+                                <li><strong>Debora</strong></li>
+                                <li><strong>MJ Croft</strong></li>
+                                <li><strong>Samantha Patrná</strong></li>
+                                <li><strong>Jura Kotek</strong></li>
+                                <li><strong>Kolkovic Myšáci</strong></li>
+                                <li><strong>Marcela Šarmanová</strong></li>
+                                <li><strong>Helena Jarošová</strong></li>
                             </ul>
                         `,
                         "jihomoravsky-kraj": `
@@ -309,6 +320,7 @@
                             <ul>
                                 <li><strong>Šárka Procházková</strong></li>
                                 <li><strong>Kristýna Seidlová</strong></li>
+                                <li><strong>Natálie Schmid</strong></li>
                             </ul>
                         `,
                         "ustecky-kraj": `
@@ -318,17 +330,17 @@
                             </ul>
                         `
                     };
-    
+
                     if (data[id]) {
                         infoBox.innerHTML = data[id];
                         infoBox.style.display = "block";
                         resetBtn.style.display = "inline-block";
                     }
-    
+
                     return false;
                 };
             });
-    
+
             resetBtn.addEventListener("click", function () {
                 infoBox.style.display = "none";
                 resetBtn.style.display = "none";
@@ -336,4 +348,5 @@
         });
     </script>
 </body>
+
 </html>
