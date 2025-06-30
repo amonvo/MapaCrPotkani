@@ -1,102 +1,141 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  overflow-x: hidden;
-  background-image: url("486374407_1834987017278719_4853302109216346905_n.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  min-height: 100vh;
+  background: 
+    linear-gradient(rgba(20,20,30,0.6), rgba(20,20,30,0.7)),
+    url("486374407_1834987017278719_4853302109216346905_n.jpg") center center/cover no-repeat;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  color: #f4f4f4;
+  box-sizing: border-box;
   cursor: url("img/pack2369-removebg-preview.png") 16 16, auto;
 }
 
 #infoBox {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 20px;
-  color: white;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  max-width: 80%;
-  margin: 20px auto;
+  background: rgba(30, 35, 50, 0.80);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 28px 28px 16px 28px;
+  color: #f4f4f4;
+  box-shadow: 0 6px 32px rgba(0,0,0,0.3);
+  max-width: 680px;
+  margin: 40px auto 20px auto;
   font-weight: 500;
   font-size: 1.3rem;
   line-height: 1.8;
-  text-shadow: 1px 1px 3px black;
+  text-shadow: 1px 1px 8px #222;
+  border: 2px solid rgba(180,180,255,0.1);
+  transition: background 0.25s, box-shadow 0.2s;
+}
+
+#infoBox strong, #infoBox b {
+  color: #ffe58d;
 }
 
 .btn-reset {
-  display: none;
-  margin-top: 10px;
-  background-color: #444;
+  display: inline-block;
+  margin-top: 18px;
+  background: linear-gradient(90deg,#52c1fa,#8445e6);
   color: white;
-  padding: 8px 12px;
+  padding: 12px 26px;
   border: none;
-  border-radius: 5px;
+  border-radius: 25px;
+  font-size: 1.15rem;
+  font-weight: bold;
   cursor: pointer;
+  box-shadow: 0 2px 14px rgba(60,60,80,0.12);
+  letter-spacing: 1px;
+  transition: background 0.2s, transform 0.13s;
 }
-
-.btn-reset:hover {
-  background-color: #222;
+.btn-reset:hover, .btn-reset:focus {
+  background: linear-gradient(90deg,#8445e6,#52c1fa);
+  transform: scale(1.06);
 }
 
 .svg-map {
   width: 100%;
-  height: auto;
-  max-width: 100%;
+  max-width: 100vw;
   overflow-x: auto;
   display: block;
+  margin-bottom: 20px;
 }
 
-/* Responsive SVG */
 .svg-map svg {
   width: 100%;
   height: auto;
+  max-width: 1800px;
+  margin: 0 auto;
+  display: block;
+  box-shadow: 0 3px 16px rgba(10,10,50,0.1);
+  border-radius: 20px;
+  background: rgba(35,35,55,0.08);
+  transition: box-shadow 0.2s;
+}
+
+.svg-map svg g:hover {
+  filter: drop-shadow(0 0 8px #52c1fa77);
+  cursor: pointer;
+  transition: filter 0.13s;
+  /* žádné brightness ani přehnané rozjasnění */
 }
 
 .info-box {
-  background-color: #f8f9fa;
-  padding: 1rem;
-  margin-top: 1rem;
-  font-size: 1rem;
+  background: rgba(245, 245, 245, 0.91);
+  color: #252531;
+  padding: 1.1rem 1.4rem;
+  margin-top: 1.4rem;
+  font-size: 1.08rem;
   line-height: 1.5;
-  border-radius: 8px;
+  border-radius: 16px;
   max-width: 100%;
   box-sizing: border-box;
+  box-shadow: 0 2px 9px rgba(30,30,60,0.12);
 }
 
-.btn-reset {
-  margin-top: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-}
-
-text.hover {
-  font-size: 12px;
+.text-hover, text.hover {
+  font-size: 13px;
   pointer-events: auto;
+  fill: #ffe58d;
+  filter: drop-shadow(0 0 6px #1a1a1a);
+  transition: font-size 0.12s;
 }
 
-/* Menší zařízení */
+.text-hover:hover, text.hover:hover {
+  font-size: 15px;
+  fill: #fff;
+}
+
 @media (max-width: 768px) {
   #infoBox {
-    font-size: 1.1rem;
-    padding: 16px;
-    margin-bottom: 0;
+    font-size: 1.07rem;
+    padding: 15px 8px 8px 8px;
+    margin: 12px 6px 8px 6px;
+    border-radius: 12px;
   }
-
-  text.hover {
-    font-size: 10px;
-  }
-
   .svg-map svg {
-    width: 100% !important;
-    height: auto !important;
-    max-width: 100%;
+    max-width: 98vw;
+    border-radius: 10px;
   }
+  .info-box {
+    padding: 0.6rem 0.7rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    margin-top: 0.6rem;
+  }
+}
 
-  html, body {
-    height: auto;
-    min-height: 100vh;
+@media (max-width: 430px) {
+  #infoBox {
+    font-size: 0.98rem;
+    padding: 9px 3px;
+    border-radius: 8px;
+  }
+  .btn-reset {
+    font-size: 0.97rem;
+    padding: 7px 16px;
+    border-radius: 18px;
+  }
+  .svg-map svg {
+    border-radius: 7px;
   }
 }
