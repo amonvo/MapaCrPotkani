@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Alegreya+Sans:300,400,500,700"
         rel="stylesheet" />
     <!-- JavaScript knihovny – pokud je potřebuješ -->
+    <script src="password.js"></script>
 </head>
 
 <body class="stretched no-transition device-lg" itemscope="" itemtype="https://schema.org/WebPage">
@@ -19,7 +20,45 @@
         <section id="content">
             <div class="content-wrap bg-topmap04 nopadding">
                 <div class="container clearfix center">
+                    <!-- Statistiky a přehled -->
+                    <div class="statistics-section">
+                        <div class="stats-container">
+                            <div class="stat-card total-helpers">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="totalHelpers">0</div>
+                                    <div class="stat-label">Celkem pomocníků</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card active-regions">
+                                <div class="stat-icon">🗺️</div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="activeRegions">0</div>
+                                    <div class="stat-label">Aktivních krajů</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card top-region">
+                                <div class="stat-icon">🏆</div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="topRegionCount">0</div>
+                                    <div class="stat-label">Nejvíce pomocníků</div>
+                                    <div class="stat-subtitle" id="topRegionName">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <h3>Rozložení pomocníků podle krajů</h3>
+                            <div class="chart" id="helpersChart">
+                                <!-- Graf se vygeneruje pomocí JavaScriptu -->
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="svg-map mapa-cesko" title="Záchrana potkanů odevšad">
+                        <div id="tooltip" class="tooltip"></div>
                         <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"
                             preserveAspectRatio="xMinYMin meet" version="1" x="0" y="0" viewBox="0 0 1116.25 689.86"
                             enable-background="new 0 0 1116.247 689.856" xml:space="preserve" id="svg2">
@@ -214,140 +253,292 @@
         </section>
     </div>
 
-    <div id="gotoTop" class="icon-angle-up"></div>
+    
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const infoBox = document.getElementById("infoBox");
             const resetBtn = document.getElementById("resetBtn");
-
+            const tooltip = document.getElementById("tooltip");
             const kraje = document.querySelectorAll(".hover");
+            
+            // Elementy pro statistiky
+            const totalHelpersEl = document.getElementById("totalHelpers");
+            const activeRegionsEl = document.getElementById("activeRegions");
+            const topRegionCountEl = document.getElementById("topRegionCount");
+            const topRegionNameEl = document.getElementById("topRegionName");
+            const helpersChartEl = document.getElementById("helpersChart");
 
-            kraje.forEach(kraj => {
-                kraj.style.cursor = "pointer";
-                kraj.onclick = function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    const id = this.getAttribute("note");
-
-                    const data = {
-                        "plzensky-kraj": `
+            // Funkce pro výpočet počtu pomocníků z HTML stringu
+            function countHelpersFromHTML(htmlString) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlString;
+                const listItems = tempDiv.querySelectorAll('li');
+                return listItems.length;
+            }
+            
+            // Funkce pro aktualizaci statistik
+            function updateStatistics() {
+                let totalHelpers = 0;
+                let activeRegions = 0;
+                let regionStats = [];
+                let maxHelpers = 0;
+                let topRegion = '';
+                
+                // Procházíme všechna data a počítáme statistiky
+                Object.keys(data).forEach(regionId => {
+                    const helpersCount = countHelpersFromHTML(data[regionId]);
+                    if (helpersCount > 0) {
+                        totalHelpers += helpersCount;
+                        activeRegions++;
+                        regionStats.push({
+                            id: regionId,
+                            name: krajNames[regionId] || regionId,
+                            count: helpersCount
+                        });
+                        
+                        if (helpersCount > maxHelpers) {
+                            maxHelpers = helpersCount;
+                            topRegion = krajNames[regionId] || regionId;
+                        }
+                    }
+                });
+                
+                // Aktualizujeme zobrazení
+                animateNumber(totalHelpersEl, totalHelpers);
+                animateNumber(activeRegionsEl, activeRegions);
+                animateNumber(topRegionCountEl, maxHelpers);
+                topRegionNameEl.textContent = topRegion;
+                
+                // Generujeme graf
+                generateChart(regionStats);
+            }
+            
+            // Funkce pro animaci čísel
+            function animateNumber(element, targetValue) {
+                const startValue = 0;
+                const duration = 1500;
+                const startTime = performance.now();
+                
+                function updateNumber(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const currentValue = Math.floor(startValue + (targetValue - startValue) * progress);
+                    
+                    element.textContent = currentValue;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(updateNumber);
+                    }
+                }
+                
+                requestAnimationFrame(updateNumber);
+            }
+            
+            // Funkce pro generování grafu
+            function generateChart(regionStats) {
+                // Seřadíme podle počtu pomocníků (sestupně)
+                regionStats.sort((a, b) => b.count - a.count);
+                
+                const maxCount = regionStats.length > 0 ? regionStats[0].count : 1;
+                
+                const chartHTML = regionStats.map(region => {
+                    const barWidth = (region.count / maxCount) * 100;
+                    return `
+                        <div class="chart-item">
+                            <div class="chart-region">${region.name}</div>
+                            <div class="chart-bar" style="width: ${barWidth}%"></div>
+                            <div class="chart-count">${region.count} pomocníků</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                helpersChartEl.innerHTML = chartHTML;
+            }
+            
+            // Názvy krajů pro tooltipy
+            const krajNames = {
+                "karlovarsky-kraj": "Karlovarský kraj",
+                "ustecky-kraj": "Ústecký kraj",
+                "liberecky-kraj": "Liberecký kraj",
+                "kralovehradecky-kraj": "Královéhradecký kraj",
+                "pardubicky-kraj": "Pardubický kraj",
+                "stredocesky-kraj": "Středočeský kraj",
+                "hlavni-mesto-praha": "Hlavní město Praha",
+                "jihocesky-kraj": "Jihočeský kraj",
+                "plzensky-kraj": "Plzeňský kraj",
+                "kraj-vysocina": "Kraj Vysočina",
+                "jihomoravsky-kraj": "Jihomoravský kraj",
+                "olomoucky-kraj": "Olomoucký kraj",
+                "zlinsky-kraj": "Zlínský kraj",
+                "moravskoslezsky-kraj": "Moravskoslezský kraj"
+            };
+            
+            // Data o pomocnících v krajích
+            const data = {
+                "plzensky-kraj": `
                     <h2>Pomocníci v Plzeňském kraji</h2>
                     <ul>
                         <li><strong>Vojtěch Amon</strong></li>
                         <li><strong>Zuzana Zelinková</strong></li>
-                        <li><strong>Kany Kanystr</strong></li>
-                        <li><strong>Veru Škorňáková</strong></li>
+                        <li><strong>Kany Kanystr</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=100018130300741', event)">Facebook profil</a></li>
                     </ul>
                 `,
-                        "jihocesky-kraj": `
+                "jihocesky-kraj": `
                     <h2>Pomocníci v Jihočeském kraji</h2>
                     <ul>
                         <li><strong>Vojtěch Amon</strong></li>
                         <li><strong>Zuzana Zelinková</strong></li>
                     </ul>
                 `,
-                        "hlavni-mesto-praha": `
+                "hlavni-mesto-praha": `
                     <h2>Pomocníci v Praze</h2>
                     <ul>
-                        <li><strong>Debora</strong></li>
-                        <li><strong>MJ Croft</strong></li>
-                        <li><strong>Samantha Patrná</strong></li>
-                        <li><strong>Jura Kotek</strong></li>
-                        <li><strong>Kolkovic Myšáci</strong></li>
-                        <li><strong>Marcela Šarmanová</strong></li>
-                        <li><strong>Helena Jarošová / Len Jarinor</strong></li>
-                        <li><strong>Peroxid Vodíku</strong></li>
-                        <li><strong>Nikol En</strong></li>
-                        <li><strong>Anna Šolínová</strong></li>
+                        <li><strong>Debora</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/debora.dubnova.3', event)">Facebook profil</a></li>
+                        <li><strong>MJ Croft</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/maja.janakova', event)">Facebook profil</a></li>
+                        <li><strong>Samantha Patrná</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/hello.there.honey3000', event)">Facebook profil</a></li>
+                        <li><strong>Jura Kotek</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=100015779353900', event)">Facebook profil</a></li>
+                        <li><strong>Kolkovic Myšáci</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=100095161614522', event)">Facebook profil</a></li>
+                        <li><strong>Marcela Šarmanová</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=61567163737613', event)">Facebook profil</a></li>
+                        <li><strong>Helena Jarošová / Len Jarinor</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=100089551021672', event)">Facebook profil</a></li>
+                        <li><strong>Peroxid Vodíku</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/peroxidek', event)">Facebook profil</a></li>
+                        <li><strong>Anna Šolínová</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/anna.solinova', event)">Facebook profil</a></li>
                     </ul>
                 `,
-                        "kraj-vysocina": `
+                "kraj-vysocina": `
                     <h2>Pomocníci v Kraji Vysočina</h2>
                     <ul>
-                        <li><strong>Debora</strong></li>
-                        <li><strong>Magdaléna Šorfová</strong></li>
-                        <li><strong>Kamyl Kájký Doležalová</strong></li>
-                        <li><strong>Kiki Vasickova</strong></li>
+                        <li><strong>Debora</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/debora.dubnova.3', event)">Facebook profil</a></li>
+                        <li><strong>Magdaléna Šorfová</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/magdalena.sorfova', event)">Facebook profil</a></li>
+                        <li><strong>Kamyl Kájký Doležalová</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/kamyl.dolezalova', event)">Facebook profil</a></li>
+                        <li><strong>Kiki Vasickova</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/kristyna.duskova.75', event)">Facebook profil</a></li>
                     </ul>
                 `,
-                        "pardubicky-kraj": `
+                "pardubicky-kraj": `
                     <h2>Pomocníci v Pardubickém kraji</h2>
                     <ul>
-                        <li><strong>Nela Drahošová</strong></li>
-                        <li><strong>Lucka Bucháčková</strong></li>
-                        <li><strong>Martina Maťa Svobodová</strong></li>
+                        <li><strong>Nela Drahošová</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/nela.drahosova.35', event)">Facebook profil</a></li>
+                        <li><strong>Lucka Bucháčková</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/lucka.buchackova', event)">Facebook profil</a></li>
+                        <li><strong>Martina Maťa Svobodová</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/martina.golejova.3', event)">Facebook profil</a></li>
                     </ul>
                 `,
-                        "moravskoslezsky-kraj": `
+                "moravskoslezsky-kraj": `
                     <h2>Pomocníci v Moravskoslezském kraji</h2>
                     <ul>
-                        <li><strong>Milan Miňo Bača</strong></li>
-                        <li><strong>Adam Harangozó</strong></li>
-                        <li><strong>Helena Jarošová</strong></li>
-                        <li><strong>Esmisoi Vieš</strong></li>
-                        <li><strong>Martina Novotná</strong></li>
+                        <li><strong>Milan Miňo Bača</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/milan.mino.baca', event)">Facebook profil</a></li>
+                        <li><strong>Adam Harangozó</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/adam.harangozo.50', event)">Facebook profil</a></li>
+                        <li><strong>Esmisoi Vieš</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/esmisoi.vies', event)">Facebook profil</a></li>
+                        <li><strong>Martina Novotná</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/martinaonyxianovotna', event)">Facebook profil</a></li>
                     </ul>
                 `,
-                        "zlinsky-kraj": `
+                "zlinsky-kraj": `
                     <h2>Pomocníci ve Zlínském kraji</h2>
                     <ul>
-                        <li><strong>Honza Hrabina</strong></li>
+                        <li><strong>Honza Hrabina</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/jan.hrabina', event)">Facebook profil</a></li>
                     </ul>
                 `,
-                        "liberecky-kraj": `
+                "liberecky-kraj": `
                     <h2>Pomocníci v Libereckém kraji</h2>
                     <ul>
-                        <li><strong>Nina Žufič</strong></li>
-                        <li><strong>Ján Račko</strong></li>
+                        <li><strong>Nina Žufič</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/nina.zufic.3', event)">Facebook profil</a></li>
+                        <li><strong>Ján Račko</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/jan.racko', event)">Facebook profil</a></li>
                     </ul>
                 `,
-                        "kralovehradecky-kraj": `
+                "kralovehradecky-kraj": `
                     <h2>Pomocníci v Královéhradeckém kraji</h2>
                     <ul>
-                        <li><strong>Anet</strong></li>
+                        <li><strong>Anet</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/leshija', event)">Facebook profil</a></li>
                     </ul>
                 `,
-                        "stredocesky-kraj": `
+                "stredocesky-kraj": `
                     <h2>Pomocníci ve Středočeském kraji</h2>
                     <ul>
-                        <li><strong>Debora</strong></li>
-                        <li><strong>MJ Croft</strong></li>
-                        <li><strong>Samantha Patrná</strong></li>
-                        <li><strong>Jura Kotek</strong></li>
-                        <li><strong>Kolkovic Myšáci</strong></li>
-                        <li><strong>Marcela Šarmanová</strong></li>
-                        <li><strong>Helena Jarošová</strong></li>
+                        <li><strong>Debora</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/debora.dubnova.3', event)">Facebook profil</a></li>
+                        <li><strong>MJ Croft</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/maja.janakova', event)">Facebook profil</a></li>
+                        <li><strong>Samantha Patrná</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/hello.there.honey3000', event)">Facebook profil</a></li>
+                        <li><strong>Jura Kotek</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=100015779353900', event)">Facebook profil</a></li>
+                        <li><strong>Kolkovic Myšáci</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=100095161614522', event)">Facebook profil</a></li>
+                        <li><strong>Marcela Šarmanová</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=61567163737613', event)">Facebook profil</a></li>
+                        <li><strong>Helena Jarošová</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=100089551021672', event)">Facebook profil</a></li>
+                        <li><strong>Zuzana Kohoutova</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/zuzana.kohoutova.731', event)">Facebook profil</a></li>
                     </ul>
                 `,
-                        "karlovarsky-kraj": `
+                "karlovarsky-kraj": `
                     <h2>Pomocníci v Karlovarském kraji</h2>
                     <ul>
-                        <li><strong>Blanka Jílková</strong></li>
+                        <li><strong>Blanka Jílková</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/blanca.jilkova', event)">Facebook profil</a></li>
                     </ul>
                 `,
-                        "jihomoravsky-kraj": `
+                "jihomoravsky-kraj": `
                     <h2>Pomocníci v Jihomoravském kraji</h2>
                     <ul>
-                        <li><strong>Šárka Procházková</strong></li>
-                        <li><strong>Kristýna Seidlová</strong></li>
-                        <li><strong>Natálie Schmid</strong></li>
-                        <li><strong>Michaela Macháčková</strong></li>
+                        <li><strong>Šárka Procházková</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=100015439454195', event)">Facebook profil</a></li>
+                        <li><strong>Kristýna Seidlová</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/Mia.Laffay', event)">Facebook profil</a></li>
+                        <li><strong>Natálie Schmid</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/natalie.slavikova.52', event)">Facebook profil</a></li>
+                        <li><strong>Michaela Macháčková</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/michaela.studena.14', event)">Facebook profil</a></li>
                     </ul>
                 `,
-                        "ustecky-kraj": `
+                "olomoucky-kraj": `
+                    <h2>Pomocníci v Olomouckém kraji</h2>
+                    <ul>
+                        <li><strong>Helena Jarošová / Len Jarinor</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=100089551021672', event)">Facebook profil</a></li>
+                    </ul>
+                `,
+                "ustecky-kraj": `
                     <h2>Pomocníci v Ústeckém kraji</h2>
                     <ul>
-                        <li><strong>Barbora Klabíková</strong></li>
-                        <li><strong>Martina Hrtanková</strong></li>
-                        <li><strong>Ludmila Linkova </strong></li>
+                        <li><strong>Barbora Klabíková</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/profile.php?id=1480261032', event)">Facebook profil</a></li>
+                        <li><strong>Martina Hrtanková</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/martula.hrtankova', event)">Facebook profil</a></li>
+                        <li><strong>Ludmila Linkova</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/ludmila.linkova', event)">Facebook profil</a></li>
+                        <li><strong>Terysek Vítek Grivalská</strong> - <a href="#" onclick="openFacebookProfile('https://www.facebook.com/terysek.laskova', event)">Facebook profil</a></li>
                     </ul>
                 `
-                    };
+            };
+
+            kraje.forEach(kraj => {
+                kraj.style.cursor = "pointer";
+                
+                // Tooltip funkcionalita
+                kraj.addEventListener("mouseenter", function(e) {
+                    const krajId = this.id;
+                    const krajName = krajNames[krajId];
+                    if (krajName) {
+                        tooltip.textContent = krajName;
+                        tooltip.classList.add("show");
+                    }
+                });
+                
+                kraj.addEventListener("mousemove", function(e) {
+                    if (tooltip.classList.contains("show")) {
+                        tooltip.style.left = e.pageX + 10 + "px";
+                        tooltip.style.top = e.pageY - 30 + "px";
+                    }
+                });
+                
+                kraj.addEventListener("mouseleave", function() {
+                    tooltip.classList.remove("show");
+                });
+                
+                kraj.onclick = function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const id = this.getAttribute("note");
 
                     if (data[id]) {
                         infoBox.innerHTML = data[id];
+                        infoBox.style.display = "block";
+                        resetBtn.style.display = "inline-block";
+                        // Tohle způsobí scroll na infoBox
+                        infoBox.scrollIntoView({ behavior: "smooth" });
+                    } else {
+                        // Kraj nemá žádné pomocníky
+                        const krajName = krajNames[id] || id;
+                        infoBox.innerHTML = `
+                            <h2>${krajName}</h2>
+                            <p>V tomto kraji zatím nemáme žádné registrované pomocníky.</p>
+                            <p>Pokud chcete pomoci potkanům v tomto kraji, kontaktujte nás prosím.</p>
+                        `;
                         infoBox.style.display = "block";
                         resetBtn.style.display = "inline-block";
                         // Tohle způsobí scroll na infoBox
@@ -361,9 +552,16 @@
             resetBtn.addEventListener("click", function () {
                 infoBox.style.display = "none";
                 resetBtn.style.display = "none";
+                // Posun stránku nahoru na začátek
+                window.scrollTo({ top: 0, behavior: "smooth" });
             });
+            
+            // Inicializace statistik po načtení stránky
+            updateStatistics();
         });
     </script>
+    
+
 
 </body>
 

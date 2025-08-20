@@ -12,25 +12,60 @@ html, body {
 }
 
 #infoBox {
-  background: rgba(30, 35, 50, 0.80);
-  backdrop-filter: blur(12px);
+  background: rgba(30, 35, 50, 0.90);
+  backdrop-filter: blur(15px);
   border-radius: 20px;
   padding: 28px 28px 16px 28px;
   color: #f4f4f4;
-  box-shadow: 0 6px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
   max-width: 680px;
   margin: 40px auto 20px auto;
   font-weight: 500;
   font-size: 1.3rem;
   line-height: 1.8;
   text-shadow: 1px 1px 8px #222;
-  border: 2px solid rgba(180,180,255,0.1);
-  transition: background 0.25s, box-shadow 0.2s;
+  border: 2px solid rgba(180,180,255,0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+#infoBox::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(82, 193, 250, 0.1),
+    transparent
+  );
+  animation: infoBoxShine 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+
+
+@keyframes infoBoxShine {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 #infoBox strong, #infoBox b {
   color: #ffe58d;
+  text-shadow: 0 0 10px rgba(255, 229, 141, 0.3);
 }
+
+
 
 .btn-reset {
   display: inline-block;
@@ -43,13 +78,47 @@ html, body {
   font-size: 1.15rem;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 2px 14px rgba(60,60,80,0.12);
+  box-shadow: 0 4px 20px rgba(60,60,80,0.2);
   letter-spacing: 1px;
-  transition: background 0.2s, transform 0.13s;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  animation: buttonPulse 4s ease-in-out infinite;
 }
-.btn-reset:hover, .btn-reset:focus {
-  background: linear-gradient(90deg,#8445e6,#52c1fa);
-  transform: scale(1.06);
+
+.btn-reset::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.btn-reset:hover::before {
+  left: 100%;
+}
+
+.btn-reset:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 30px rgba(82, 193, 250, 0.4);
+  background: linear-gradient(90deg,#5ac8ff,#8f4ff0);
+}
+
+@keyframes buttonPulse {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(60,60,80,0.2);
+  }
+  50% {
+    box-shadow: 0 6px 25px rgba(82, 193, 250, 0.3);
+  }
 }
 
 .svg-map {
@@ -58,6 +127,7 @@ html, body {
   overflow-x: auto;
   display: block;
   margin-bottom: 20px;
+  position: relative;
 }
 
 .svg-map svg {
@@ -66,21 +136,139 @@ html, body {
   max-width: 1800px;
   margin: 0 auto;
   display: block;
-  box-shadow: 0 3px 16px rgba(10,10,50,0.1);
+  box-shadow: 0 8px 30px rgba(10,10,50,0.2);
   border-radius: 20px;
-  background: rgba(35,35,55,0.08);
-  transition: box-shadow 0.2s;
+  background: rgba(35,35,55,0.1);
+  position: relative;
+  overflow: hidden;
 }
 
-.svg-map svg g:hover {
-  filter: drop-shadow(0 0 8px #52c1fa77);
+/* Pokročilé efekty na mapu */
+.svg-map svg::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(circle at 30% 20%, rgba(82, 193, 250, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(132, 69, 230, 0.06) 0%, transparent 50%),
+    linear-gradient(45deg, transparent 40%, rgba(82, 193, 250, 0.04) 50%, transparent 60%);
+  animation: mapGlow 12s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.svg-map svg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 20px,
+      rgba(82, 193, 250, 0.02) 20px,
+      rgba(82, 193, 250, 0.02) 40px
+    );
+  animation: mapScan 6s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+
+
+@keyframes mapGlow {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    opacity: 0.4;
+  }
+  25% {
+    transform: translate(-30%, -70%) rotate(90deg) scale(1.1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(180deg) scale(0.9);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(-70%, -30%) rotate(270deg) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes mapScan {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Základní styly pro kraje */
+.hover {
   cursor: pointer;
-  transition: filter 0.13s;
-  /* žádné brightness ani přehnané rozjasnění */
 }
 
+/* Základní styly pro text v mapě */
+.text-hover, text.hover {
+  font-size: 13px;
+  pointer-events: auto;
+  fill: #ffe58d;
+  filter: drop-shadow(0 0 6px #1a1a1a);
+  cursor: pointer;
+}
+
+/* Tooltip styly */
+.tooltip {
+  position: absolute;
+  background: rgba(30, 35, 50, 0.95);
+  color: #f4f4f4;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  border: 1px solid rgba(180,180,255,0.2);
+  backdrop-filter: blur(10px);
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.tooltip.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Loading animace */
+#loading {
+
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top: 2px solid #52c1fa;
+  border-radius: 50%;
+
+}
+
+
+
+
+
+/* Základní info boxy */
 .info-box {
-  background: rgba(245, 245, 245, 0.91);
+  background: rgba(245, 245, 245, 0.95);
   color: #252531;
   padding: 1.1rem 1.4rem;
   margin-top: 1.4rem;
@@ -89,53 +277,295 @@ html, body {
   border-radius: 16px;
   max-width: 100%;
   box-sizing: border-box;
-  box-shadow: 0 2px 9px rgba(30,30,60,0.12);
+  box-shadow: 0 4px 20px rgba(30,30,60,0.15);
+  border: 1px solid rgba(82, 193, 250, 0.1);
 }
 
-.text-hover, text.hover {
-  font-size: 13px;
-  pointer-events: auto;
-  fill: #ffe58d;
-  filter: drop-shadow(0 0 6px #1a1a1a);
-  transition: font-size 0.12s;
-}
-
-.text-hover:hover, text.hover:hover {
-  font-size: 15px;
-  fill: #fff;
-}
-
+/* Responsivní design */
 @media (max-width: 768px) {
   #infoBox {
     font-size: 1.07rem;
-    padding: 15px 8px 8px 8px;
-    margin: 12px 6px 8px 6px;
-    border-radius: 12px;
+    padding: 20px 15px 15px 15px;
+    margin: 15px 10px 10px 10px;
+    border-radius: 15px;
   }
+  
   .svg-map svg {
     max-width: 98vw;
-    border-radius: 10px;
+    border-radius: 15px;
   }
+  
   .info-box {
-    padding: 0.6rem 0.7rem;
+    padding: 0.8rem 1rem;
     font-size: 1rem;
-    border-radius: 8px;
-    margin-top: 0.6rem;
+    border-radius: 12px;
+    margin-top: 0.8rem;
   }
+  
+  .btn-reset {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 20px;
+  }
+  
+
 }
 
 @media (max-width: 430px) {
   #infoBox {
-    font-size: 0.98rem;
-    padding: 9px 3px;
-    border-radius: 8px;
+    font-size: 0.95rem;
+    padding: 15px 10px;
+    border-radius: 12px;
+    margin: 10px 5px;
   }
+  
   .btn-reset {
-    font-size: 0.97rem;
-    padding: 7px 16px;
+    font-size: 0.9rem;
+    padding: 8px 16px;
     border-radius: 18px;
   }
+  
   .svg-map svg {
-    border-radius: 7px;
+    border-radius: 10px;
+  }
+  
+  .text-hover, text.hover {
+    font-size: 11px;
+  }
+  
+
+}
+
+/* Dark mode podpora */
+@media (prefers-color-scheme: dark) {
+  .info-box {
+    background: rgba(30, 35, 50, 0.95);
+    color: #f4f4f4;
   }
 }
+
+/* Statistiky a přehled */
+.statistics-section {
+    margin: 40px auto;
+    max-width: 1200px;
+    padding: 0 20px;
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: rgba(30, 35, 50, 0.90);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 25px;
+    border: 2px solid rgba(180,180,255,0.15);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(82, 193, 250, 0.1),
+        transparent
+    );
+    animation: statCardShine 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 50px rgba(0,0,0,0.5);
+    border-color: rgba(82, 193, 250, 0.3);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #52c1fa;
+    text-shadow: 0 0 15px rgba(82, 193, 250, 0.5);
+    margin-bottom: 5px;
+    animation: numberPulse 2s ease-in-out infinite;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: #f4f4f4;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.stat-subtitle {
+    font-size: 0.9rem;
+    color: #ffe58d;
+    font-weight: 400;
+}
+
+.chart-container {
+    background: rgba(30, 35, 50, 0.90);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 30px;
+    border: 2px solid rgba(180,180,255,0.15);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+}
+
+.chart-container h3 {
+    color: #f4f4f4;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.4rem;
+    text-shadow: 1px 1px 8px #222;
+}
+
+.chart {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.chart-item {
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid rgba(180,180,255,0.1);
+    transition: all 0.3s ease;
+}
+
+.chart-item:hover {
+    background: rgba(82, 193, 250, 0.1);
+    border-color: rgba(82, 193, 250, 0.3);
+    transform: scale(1.02);
+}
+
+.chart-region {
+    font-weight: bold;
+    color: #f4f4f4;
+    margin-bottom: 8px;
+    font-size: 1rem;
+}
+
+.chart-bar {
+    background: linear-gradient(90deg, #52c1fa, #8445e6);
+    height: 8px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: barShine 3s ease-in-out infinite;
+}
+
+.chart-count {
+    font-size: 0.9rem;
+    color: #ffe58d;
+    font-weight: 500;
+}
+
+@keyframes statCardShine {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+}
+
+@keyframes numberPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes barShine {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+}
+
+/* Responzivní design pro statistiky */
+@media (max-width: 768px) {
+    .stats-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .stat-card {
+        padding: 20px;
+        gap: 15px;
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .chart {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Facebook links */
+.info-box a {
+    color: #1877f2;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(24, 119, 242, 0.1);
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.info-box a:hover {
+    background: rgba(24, 119, 242, 0.2);
+    color: #0d6efd;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
+}
+
+
+
+
